@@ -1,0 +1,9 @@
+[2026-10-21 10:05:35,826 INFO  L148      ReqCheckAnnotator]: Check vacuity=true, Rt-inconsistency range=2, Check consistency=true, Report trivial rt-consistency=false, Always use all invariants during rt-inconsistency checks=true, Generate failure path for rt-inconsistency=false
+[2026-10-21 10:05:36,038 INFO  L343      ReqCheckAnnotator]: 3 of 4 PEAs are invariant
+[2026-10-21 10:05:36,040 INFO  L364      ReqCheckAnnotator]: Computing rt-inconsistency assertions for 1 subsets
+[2026-10-21 10:05:36,187 INFO  L405   cyConditionGenerator]: 1 checks, 1 trivial consistent, 0 non-trivial
+  - ReqCheckSuccessResult [Unknown line] : All requirements are consistent
+    All requirements are consistent
+  - ReqCheckSuccessResult [Line: -1]: Requirement I04_ct0 is non-vacuous
+    Requirement I04_ct0 is non-vacuous
+RESULT: Ultimate could not prove your program: Toolchain returned no result.

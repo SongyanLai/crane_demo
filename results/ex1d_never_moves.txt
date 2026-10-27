@@ -1,0 +1,104 @@
+ kind2 v3.0.0
+
+
+
+================================================================================
+Analyzing SimpleHoistLogic
+  with First top: 'SimpleHoistLogic' (no subsystems)
+
+<Success> Property I16_conflicting_cmds is valid by property directed reachability (IA) after 0.031s.
+
+<Success> Property I01_estop is valid by property directed reachability (QE) after 0.052s.
+
+<Success> Property I03_upper_limit is valid by property directed reachability (QE) after 0.052s.
+
+<Success> Property I04_lowering_allowed_v3 is valid by property directed reachability (QE) after 0.052s.
+
+--------------------------------------------------------------------------------
+Summary of Properties:
+--------------------------------------------------------------------------------
+I01_estop: valid (k=1)
+  (estop => ((not up_cmd) and (not down_cmd)))
+
+I03_upper_limit: valid (k=1)
+  (upper_limit => (not up_cmd))
+
+I04_lowering_allowed_v3: valid (k=1)
+  ((((upper_limit and joy_down) and (not joy_up)) and (not estop)) => down_cmd)
+
+I16_conflicting_cmds: valid (k=1)
+  ((joy_up and joy_down) => ((not up_cmd) and (not down_cmd)))
+
+================================================================================
+
+
+
+================================================================================
+Analyzing NeverMoves_vs_repaired
+  with First top: 'NeverMoves_vs_repaired' (no subsystems)
+
+<Failure> Property I04_lowering_allowed_v3 is invalid by property directed reachability (QE) for k=0 after 0.032s.
+
+Counterexample:
+  Node NeverMoves_vs_repaired ()
+    == Mode(s) ==
+    
+    == Inputs ==
+    estop       ff
+    upper_limit tt
+    joy_up      ff
+    joy_down    tt
+    == Outputs ==
+    up_cmd      ff
+    down_cmd    ff
+    
+  
+<Success> Property I16_conflicting_cmds is valid by property directed reachability (IA) after 0.043s.
+
+<Success> Property I01_estop is valid by property directed reachability (QE) after 0.053s.
+
+<Success> Property I03_upper_limit is valid by property directed reachability (QE) after 0.053s.
+
+--------------------------------------------------------------------------------
+Summary of Properties:
+--------------------------------------------------------------------------------
+I01_estop: valid (k=1)
+  (estop => ((not up_cmd) and (not down_cmd)))
+
+I03_upper_limit: valid (k=1)
+  (upper_limit => (not up_cmd))
+
+I04_lowering_allowed_v3: invalid after 0 steps
+  ((((upper_limit and joy_down) and (not joy_up)) and (not estop)) => down_cmd)
+
+I16_conflicting_cmds: valid (k=1)
+  ((joy_up and joy_down) => ((not up_cmd) and (not down_cmd)))
+
+================================================================================
+
+
+
+================================================================================
+Analyzing NeverMoves
+  with First top: 'NeverMoves' (no subsystems)
+
+<Success> Property I16_conflicting_cmds is valid by property directed reachability (IA) after 0.042s.
+
+<Success> Property I01_estop is valid by property directed reachability (QE) after 0.042s.
+
+<Success> Property I03_upper_limit is valid by property directed reachability (QE) after 0.042s.
+
+--------------------------------------------------------------------------------
+Summary of Properties:
+--------------------------------------------------------------------------------
+I01_estop: valid (k=1)
+  (estop => ((not up_cmd) and (not down_cmd)))
+
+I03_upper_limit: valid (k=1)
+  (upper_limit => (not up_cmd))
+
+I16_conflicting_cmds: valid (k=1)
+  ((joy_up and joy_down) => ((not up_cmd) and (not down_cmd)))
+
+================================================================================
+

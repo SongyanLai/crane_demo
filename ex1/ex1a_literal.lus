@@ -1,0 +1,16 @@
+-- Example 1a: intents #1, #3, #4, #16 of Crane_Case_Study.docx, taken literally.
+-- Inputs (operator and sensors): estop, upper_limit, joy_up, joy_down
+-- Outputs (hoist control logic): up_cmd, down_cmd        One step = one PLC scan.
+node imported Hoist(estop, upper_limit, joy_up, joy_down : bool)
+returns (up_cmd, down_cmd : bool);
+(*@contract
+  -- #1  Emergency stop activation shall result in all motion commands being inhibited.
+  guarantee "I01_estop" estop => (not up_cmd and not down_cmd);
+  -- #3  When the upper limit is active, further hoisting upward shall be prohibited.
+  guarantee "I03_upper_limit" upper_limit => not up_cmd;
+  -- #4  When the upper limit is active, lowering may remain permitted ("may" written as "shall").
+  guarantee "I04_lowering_allowed" (upper_limit and joy_down) => down_cmd;
+  -- #16 Simultaneous Hoist Up and Hoist Down commands shall not create motion.
+  guarantee "I16_conflicting_cmds" (joy_up and joy_down) => (not up_cmd and not down_cmd);
+*)
+

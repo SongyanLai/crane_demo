@@ -1,0 +1,7 @@
+[2026-10-21 10:07:02,936 INFO  L343      ReqCheckAnnotator]: 1 of 3 PEAs are invariant
+[2026-10-21 10:07:02,937 INFO  L364      ReqCheckAnnotator]: Computing rt-inconsistency assertions for 1 subsets
+[2026-10-21 10:07:03,076 INFO  L405   cyConditionGenerator]: 1 checks, 0 trivial consistent, 1 non-trivial
+  - ReqCheckSuccessResult [Unknown line] : All requirements are consistent
+  - ReqCheckSuccessResult [Line: -1]: Requirement A01_ct0 is non-vacuous
+  - ReqCheckSuccessResult [Line: -1]: Requirement I04_ct0 is non-vacuous
+  - ReqCheckRtInconsistentResult [Line: -1]: Requirements A01_ct0, I04_ct0 are rt-inconsistent

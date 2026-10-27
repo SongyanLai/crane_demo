@@ -1,0 +1,58 @@
+*** This is NuSMV 2.6.0 (compiled on Wed Oct 14 15:36:56 2015)
+*** Enabled addons are: compass
+*** For more information on NuSMV see <http://nusmv.fbk.eu>
+*** or email to <nusmv-users@list.fbk.eu>.
+*** Please report bugs to <Please report bugs to <nusmv-users@fbk.eu>>
+
+*** Copyright (c) 2010-2014, Fondazione Bruno Kessler
+
+*** This version of NuSMV is linked to the CUDD library version 2.4.1
+*** Copyright (c) 1995-2004, Regents of the University of Colorado
+
+*** This version of NuSMV is linked to the MiniSat SAT solver. 
+*** See http://minisat.se/MiniSat.html
+*** Copyright (c) 2003-2006, Niklas Een, Niklas Sorensson
+*** Copyright (c) 2007-2010, Niklas Sorensson
+
+-- specification AG (EF up_cmd)  is true
+-- specification AG (EF down_cmd)  is true
+-- specification  G zone < 3  is false
+-- as demonstrated by the following execution sequence
+Trace Description: LTL Counterexample 
+Trace Type: Counterexample 
+  -- Loop starts here
+  -> State: 1.1 <-
+    joy_up = FALSE
+    joy_down = FALSE
+    backup_reset = FALSE
+    sensor_failed = TRUE
+    zone = 0
+    backup_latched = FALSE
+    down_cmd = FALSE
+    up_cmd = FALSE
+    backup_limit = FALSE
+    upper_limit = FALSE
+  -> State: 1.2 <-
+    joy_up = TRUE
+    up_cmd = TRUE
+  -> State: 1.3 <-
+    zone = 1
+  -> State: 1.4 <-
+    zone = 2
+  -> State: 1.5 <-
+    zone = 3
+  -> State: 1.6 <-
+    joy_up = FALSE
+    joy_down = TRUE
+    down_cmd = TRUE
+    up_cmd = FALSE
+  -> State: 1.7 <-
+    zone = 2
+  -> State: 1.8 <-
+    zone = 1
+  -> State: 1.9 <-
+    joy_down = FALSE
+    zone = 0
+    down_cmd = FALSE
+-- specification  G ((upper_limit | backup_limit) -> !up_cmd)  is true
+-- specification  G ((!backup_reset S (backup_limit & !( Y backup_limit))) -> (!up_cmd & !down_cmd))  is true

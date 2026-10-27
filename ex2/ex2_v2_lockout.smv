@@ -1,0 +1,38 @@
+-- Example 2, version 2: backup upper limit with LOCK-OUT until a special reset
+--   (EN 12077-2:2024 4.6.1.4; after the reset only the reverse direction, EN 15011:2020 5.5.3.2).
+-- Same closed loop, same fault, same properties as version 1. Only the hoist logic differs.
+-- Illustrative logic written by us, NOT company code.
+MODULE main
+VAR
+  joy_up         : boolean;
+  joy_down       : boolean;
+  backup_reset   : boolean;
+  primary_failed : boolean;
+  zone : 0..3;
+  backup_latched : boolean;  -- NEW: remembers a backup trip until the special reset
+ASSIGN
+  init(zone) := 0;
+  next(zone) := case
+      up_cmd   & zone < 3 : zone + 1;
+      down_cmd & zone > 0 : zone - 1;
+      TRUE                : zone;
+    esac;
+  next(primary_failed) := primary_failed;
+  init(backup_latched) := FALSE;
+  next(backup_latched) := case
+      next(backup_limit) & !backup_limit : TRUE;   -- trip (rising edge) sets the latch
+      next(backup_reset)                 : FALSE;  -- only the special reset clears it
+      TRUE                               : backup_latched;
+    esac;
+DEFINE
+  upper_limit  := zone >= 1 & !primary_failed;
+  backup_limit := zone >= 2;
+  -- hoist logic v2: no motion at all while latched
+  up_cmd   := joy_up & !joy_down & !upper_limit & !backup_limit & !backup_latched;
+  down_cmd := joy_down & !joy_up & !backup_latched;
+
+LTLSPEC NAME P1_no_two_block := G (zone < 3)
+LTLSPEC NAME P2_no_hoisting_at_limits := G ((upper_limit | backup_limit) -> !up_cmd)
+LTLSPEC NAME P3_backup_lockout := G ( (!backup_reset S (backup_limit & !(Y backup_limit))) -> (!up_cmd & !down_cmd) )
+SPEC NAME S1_hoisting_still_possible := AG EF up_cmd
+SPEC NAME S2_lowering_still_possible := AG EF down_cmd

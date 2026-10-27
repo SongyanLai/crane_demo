@@ -1,0 +1,37 @@
+-- Example 2, version 3: same hoist logic as version 2 (with lock-out), BUT the backup limit is
+--   NOT an independent channel: it is derived in software from the same sensor as the primary
+--   limit (what intents #26 and #28 forbid). One sensor fault now removes both protection layers.
+-- Illustrative logic written by us, NOT company code.
+MODULE main
+VAR
+  joy_up        : boolean;
+  joy_down      : boolean;
+  backup_reset  : boolean;
+  sensor_failed : boolean;   -- single fault: the one shared position/limit sensor fails silently
+  zone : 0..3;
+  backup_latched : boolean;
+ASSIGN
+  init(zone) := 0;
+  next(zone) := case
+      up_cmd   & zone < 3 : zone + 1;
+      down_cmd & zone > 0 : zone - 1;
+      TRUE                : zone;
+    esac;
+  next(sensor_failed) := sensor_failed;
+  init(backup_latched) := FALSE;
+  next(backup_latched) := case
+      next(backup_limit) & !backup_limit : TRUE;
+      next(backup_reset)                 : FALSE;
+      TRUE                               : backup_latched;
+    esac;
+DEFINE
+  upper_limit  := zone >= 1 & !sensor_failed;
+  backup_limit := zone >= 2 & !sensor_failed;   -- CHANGED: same channel as the primary limit
+  up_cmd   := joy_up & !joy_down & !upper_limit & !backup_limit & !backup_latched;
+  down_cmd := joy_down & !joy_up & !backup_latched;
+
+LTLSPEC NAME P1_no_two_block := G (zone < 3)
+LTLSPEC NAME P2_no_hoisting_at_limits := G ((upper_limit | backup_limit) -> !up_cmd)
+LTLSPEC NAME P3_backup_lockout := G ( (!backup_reset S (backup_limit & !(Y backup_limit))) -> (!up_cmd & !down_cmd) )
+SPEC NAME S1_hoisting_still_possible := AG EF up_cmd
+SPEC NAME S2_lowering_still_possible := AG EF down_cmd

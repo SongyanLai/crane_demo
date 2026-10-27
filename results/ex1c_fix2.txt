@@ -1,0 +1,14 @@
+ kind2 v3.0.0
+
+
+================================================================================
+Checking contract of imported node Hoist
+
+<Success> Contract of imported node Hoist was proven realizable after 0.075s.
+
+
+================================================================================
+Checking environment of Hoist
+
+<Success> Environment of Hoist was proven realizable after 0.000s.
+

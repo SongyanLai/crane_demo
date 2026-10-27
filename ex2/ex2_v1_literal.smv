@@ -1,0 +1,40 @@
+-- Example 2, version 1: backup upper limit implemented LITERALLY from intents #3, #5, #27
+--   "When either upper limit is active, further hoisting upward shall be prohibited."
+-- Closed loop: hoist logic + a tiny plant model (hook height zone) + one permanent fault.
+-- One step = one PLC scan. The hook moves one zone per scan while a command is given (abstraction).
+-- Illustrative logic written by us, NOT company code.
+MODULE main
+VAR
+  -- operator and environment: free inputs, any value in any scan
+  joy_up         : boolean;  -- master controller deflected: hoist up
+  joy_down       : boolean;  -- master controller deflected: lower
+  backup_reset   : boolean;  -- special reset of the backup limiter (key switch, not at the operator station)
+  primary_failed : boolean;  -- single fault: primary upper limit switch stuck, never signals
+  -- plant
+  zone : 0..3;               -- 0 working range, 1 primary limit zone, 2 backup limit zone, 3 TWO-BLOCK (hook hits trolley)
+ASSIGN
+  init(zone) := 0;
+  next(zone) := case
+      up_cmd   & zone < 3 : zone + 1;
+      down_cmd & zone > 0 : zone - 1;
+      TRUE                : zone;
+    esac;
+  next(primary_failed) := primary_failed;   -- the fault (or its absence) is permanent
+DEFINE
+  -- sensors: two independent switches
+  upper_limit  := zone >= 1 & !primary_failed;   -- primary upper limit
+  backup_limit := zone >= 2;                     -- backup upper limit, actuated directly by the hook block
+  -- hoist logic v1 (literal intents)
+  up_cmd   := joy_up & !joy_down & !upper_limit & !backup_limit;
+  down_cmd := joy_down & !joy_up;
+
+-- P1 (#6, #27): the hook never reaches two-block, even if the primary limit has failed
+LTLSPEC NAME P1_no_two_block := G (zone < 3)
+-- P2 (#3, #5, #27 as written): no hoisting while either upper limit is active
+LTLSPEC NAME P2_no_hoisting_at_limits := G ((upper_limit | backup_limit) -> !up_cmd)
+-- P3 (EN 12077-2:2024 4.6.1.4): after the backup limiter has tripped, no motion in EITHER direction
+--     until the special reset
+LTLSPEC NAME P3_backup_lockout := G ( (!backup_reset S (backup_limit & !(Y backup_limit))) -> (!up_cmd & !down_cmd) )
+-- Sanity (non-vacuity): hoisting and lowering always remain reachable
+SPEC NAME S1_hoisting_still_possible := AG EF up_cmd
+SPEC NAME S2_lowering_still_possible := AG EF down_cmd

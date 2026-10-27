@@ -1,0 +1,17 @@
+[2026-10-21 10:05:02,789 INFO  L114        SettingsManager]: Loading settings from /opt/tools/ureqcheck/UReqCheck-linux/config/ReqCheck-nonlin.epf
+Applying setting for plugin de.uni_freiburg.informatik.ultimate.pea2boogie: Always use all invariants during rt-inconsistency checks -> true
+Applying setting for plugin de.uni_freiburg.informatik.ultimate.pea2boogie: Report trivial rt-consistency -> false
+Applying setting for plugin de.uni_freiburg.informatik.ultimate.pea2boogie: Use epsilon transformation during rt-inconsistency check -> false
+Applying setting for plugin de.uni_freiburg.informatik.ultimate.pea2boogie: Check rt-inconsistency -> true
+[2026-10-21 10:05:03,424 INFO  L148      ReqCheckAnnotator]: Check vacuity=true, Rt-inconsistency range=2, Check consistency=true, Report trivial rt-consistency=false, Always use all invariants during rt-inconsistency checks=true, Generate failure path for rt-inconsistency=false
+[2026-10-21 10:05:03,457 INFO  L189       MonitoredProcess]: No working directory specified, using /opt/tools/ureqcheck/UReqCheck-linux/z3
+[2026-10-21 10:05:03,476 INFO  L327       MonitoredProcess]: [MP /opt/tools/ureqcheck/UReqCheck-linux/z3 -smt2 -in SMTLIB2_COMPLIANT=true (1)] Waiting until timeout for monitored process
+[2026-10-21 10:05:03,620 INFO  L343      ReqCheckAnnotator]: 4 of 4 PEAs are invariant
+[2026-10-21 10:05:03,625 INFO  L348      ReqCheckAnnotator]: No rt-inconsistencies possible
+[2026-10-21 10:05:03,745 INFO  L189       MonitoredProcess]: No working directory specified, using /opt/tools/ureqcheck/UReqCheck-linux/z3
+[2026-10-21 10:05:03,752 INFO  L327       MonitoredProcess]: [MP /opt/tools/ureqcheck/UReqCheck-linux/z3 SMTLIB2_COMPLIANT=true -smt2 -in -t:12000 (2)] Waiting until timeout for monitored process
+  - ReqCheckSuccessResult [Unknown line] : All requirements are consistent
+    All requirements are consistent
+RESULT: Ultimate could not prove your program: Toolchain returned no result.
+[2026-10-21 10:05:04,572 INFO  L546       MonitoredProcess]: [MP /opt/tools/ureqcheck/UReqCheck-linux/z3 SMTLIB2_COMPLIANT=true -smt2 -in -t:12000 (2)] Ended with exit code 0
+[2026-10-21 10:05:04,769 INFO  L546       MonitoredProcess]: [MP /opt/tools/ureqcheck/UReqCheck-linux/z3 -smt2 -in SMTLIB2_COMPLIANT=true (1)] Ended with exit code 0

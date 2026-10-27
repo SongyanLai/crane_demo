@@ -1,0 +1,11 @@
+Input estop is bool
+Input upper_limit is bool
+Input joy_up is bool
+Input joy_down is bool
+Output up_cmd is bool
+Output down_cmd is bool
+
+I01: Globally, it is always the case that if "estop" holds then "!up_cmd && !down_cmd" holds as well.
+I03: Globally, it is always the case that if "upper_limit" holds then "!up_cmd" holds as well.
+I04: Globally, it is always the case that if "upper_limit && joy_down" holds then "down_cmd" holds as well.
+I16: Globally, it is always the case that if "joy_up && joy_down" holds then "!up_cmd && !down_cmd" holds as well.

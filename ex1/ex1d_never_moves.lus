@@ -1,0 +1,33 @@
+-- Example 1d: what if #4 stays a "may" (no obligation)? Three concrete hoist logics are checked.
+
+-- (1) A crane that NEVER moves, against #1, #3, #16 only.
+node NeverMoves(estop, upper_limit, joy_up, joy_down : bool) returns (up_cmd, down_cmd : bool);
+(*@contract
+  guarantee "I01_estop" estop => (not up_cmd and not down_cmd);
+  guarantee "I03_upper_limit" upper_limit => not up_cmd;
+  guarantee "I16_conflicting_cmds" (joy_up and joy_down) => (not up_cmd and not down_cmd);
+*)
+let up_cmd = false; down_cmd = false; tel
+
+-- (2) The same crane, against the repaired set (with #4 as a real "shall").
+node NeverMoves_vs_repaired(estop, upper_limit, joy_up, joy_down : bool) returns (up_cmd, down_cmd : bool);
+(*@contract
+  guarantee "I01_estop" estop => (not up_cmd and not down_cmd);
+  guarantee "I03_upper_limit" upper_limit => not up_cmd;
+  guarantee "I04_lowering_allowed_v3" (upper_limit and joy_down and not joy_up and not estop) => down_cmd;
+  guarantee "I16_conflicting_cmds" (joy_up and joy_down) => (not up_cmd and not down_cmd);
+*)
+let up_cmd = false; down_cmd = false; tel
+
+-- (3) A simple, sensible hoist logic, against the repaired set.
+node SimpleHoistLogic(estop, upper_limit, joy_up, joy_down : bool) returns (up_cmd, down_cmd : bool);
+(*@contract
+  guarantee "I01_estop" estop => (not up_cmd and not down_cmd);
+  guarantee "I03_upper_limit" upper_limit => not up_cmd;
+  guarantee "I04_lowering_allowed_v3" (upper_limit and joy_down and not joy_up and not estop) => down_cmd;
+  guarantee "I16_conflicting_cmds" (joy_up and joy_down) => (not up_cmd and not down_cmd);
+*)
+let
+  up_cmd   = joy_up and not joy_down and not upper_limit and not estop;
+  down_cmd = joy_down and not joy_up and not estop;
+tel

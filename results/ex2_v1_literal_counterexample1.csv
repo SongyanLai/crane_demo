@@ -1,0 +1,9 @@
+# violated:,G ((!backup_reset S (backup_limit & !( Y backup_limit))) -> (!up_cmd & !down_cmd))
+scan,joy_up,joy_down,backup_reset,primary_failed,zone,down_cmd,up_cmd,backup_limit,upper_limit,note
+1,FALSE,FALSE,FALSE,TRUE,0,FALSE,FALSE,FALSE,FALSE,
+2,TRUE,FALSE,FALSE,TRUE,0,FALSE,TRUE,FALSE,FALSE,
+3,TRUE,FALSE,FALSE,TRUE,1,FALSE,TRUE,FALSE,FALSE,
+4,FALSE,TRUE,FALSE,TRUE,2,TRUE,FALSE,TRUE,FALSE,
+5,TRUE,TRUE,FALSE,TRUE,1,FALSE,FALSE,FALSE,FALSE,
+6,TRUE,TRUE,FALSE,TRUE,1,FALSE,FALSE,FALSE,FALSE,loop starts here
+7,TRUE,TRUE,FALSE,TRUE,1,FALSE,FALSE,FALSE,FALSE,
