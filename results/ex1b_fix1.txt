@@ -4,7 +4,7 @@
 ================================================================================
 Checking contract of imported node Hoist
 
-<Failure> Contract of imported node Hoist was proven unrealizable after 0.031s.
+<Failure> Contract of imported node Hoist was proven unrealizable after 0.052s.
 
 <Note> Computing deadlocking trace and conflict...
 
@@ -30,7 +30,7 @@ CONFLICTING CONSTRAINTS (2 elements):
   
 <Note> Checking satisfiability of contract...
 
-<Success> Contract of imported node Hoist was proven satisfiable after 0.076s.
+<Success> Contract of imported node Hoist was proven satisfiable after 0.102s.
 
 
 ================================================================================

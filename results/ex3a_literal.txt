@@ -1,0 +1,41 @@
+ kind2 v3.0.0
+
+
+================================================================================
+Checking contract of imported node Hoist
+
+<Failure> Contract of imported node Hoist was proven unrealizable after 0.043s.
+
+<Note> Computing deadlocking trace and conflict...
+
+Deadlocking trace:
+  Node Hoist ()
+    == Mode(s) ==
+    
+    == Inputs ==
+    estop       ff
+    overload    tt
+    lower_limit tt
+    joy_up      ff
+    joy_down    tt
+    == Outputs ==
+    up_cmd      ff
+    down_cmd    tt
+    
+  
+CONFLICTING CONSTRAINTS (2 elements):
+  Node Hoist
+    Guarantee I07_lower_limit at position [L10C3]
+    Guarantee I09_lowering_in_overload at position [L15C3]
+    
+  
+<Note> Checking satisfiability of contract...
+
+<Success> Contract of imported node Hoist was proven satisfiable after 0.099s.
+
+
+================================================================================
+Checking environment of Hoist
+
+<Success> Environment of Hoist was proven realizable after 0.000s.
+

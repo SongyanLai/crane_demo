@@ -1,0 +1,18 @@
+-- Example 3a: overload intents #8 and #9, with #1, #7 and #16 of Crane_Case_Study.docx, taken literally.
+-- Inputs (operator and sensors): estop, overload, lower_limit, joy_up, joy_down
+-- Outputs (hoist control logic): up_cmd, down_cmd        One step = one PLC scan.
+node imported Hoist(estop, overload, lower_limit, joy_up, joy_down : bool)
+returns (up_cmd, down_cmd : bool);
+(*@contract
+  -- #1  Emergency stop activation shall result in all motion commands being inhibited.
+  guarantee "I01_estop" estop => (not up_cmd and not down_cmd);
+  -- #7  When the lower limit is active, further lowering shall be prohibited.
+  guarantee "I07_lower_limit" lower_limit => not down_cmd;
+  -- #8  When overload is active, further lifting shall be prohibited.
+  guarantee "I08_overload_no_lifting" overload => not up_cmd;
+  -- #9  Lowering should remain available where required for safe recovery from overload.
+  --     ("should" written as "shall"; "where required for safe recovery" is not defined, so it is left out)
+  guarantee "I09_lowering_in_overload" (overload and joy_down) => down_cmd;
+  -- #16 Simultaneous Hoist Up and Hoist Down commands shall not create motion.
+  guarantee "I16_conflicting_cmds" (joy_up and joy_down) => (not up_cmd and not down_cmd);
+*)
