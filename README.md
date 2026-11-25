@@ -1,69 +1,105 @@
-# Crane requirements verification: feasibility demo (October–November 2026)
+# Crane safety requirements: formal checks and an LLM study
 
-Formal checks of safety requirements for an operator-controlled metallurgical overhead crane that
-transports molten metal. Four small examples are taken from the 33 requirement intents in
-Crane_Case_Study.docx. The hoist logic in ex2 and ex4 is illustrative, written by us from the intents.
-It is NOT company code.
+This repository collects the work on the safety requirements of an operator-controlled metallurgical overhead
+crane that transports molten metal. The requirements are the 33 requirement intents in `Crane_Case_Study.docx`.
+
+It has two parts:
+
+| Folder | What it is | Period | Status |
+|---|---|---|---|
+| [`demo/`](demo/) | **Feasibility demo.** Four small examples checked with model checkers (Kind 2, NuSMV, optionally Ultimate ReqCheck): conflicts, missing priorities and too-weak rules in the requirement text, and a suggested new wording | October–November 2026 | Complete; all outputs in `demo/results/` |
+| [`llm_study/`](llm_study/) | **LLM study.** Can large language models find the same problems on their own? Analysis of 48 runs of four LLMs on Example 1 of the demo | November 2026 | Preliminary (25 November 2026): manual scores not yet checked by a person |
+
+The two parts build on each other. The demo is the human-in-the-loop process: the author translated the
+requirements into formal rules and used the tools to find the problems. The LLM study gives the same Example 1
+(intents #1, #3, #4 and #16) to LLMs and compares their findings with the results of the demo.
 
 Author: Songyan Lai, Aalto University
 
-## What is in this repository
+## Repository layout
 
-| Folder / file             | What it checks                                                                                                                                         | Tool              |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- |
-| ex1/                      | Intents #1, #3, #4, #16 (E-stop and primary upper limit): can ANY controller satisfy them for every operator input? (realizability)                     | Kind 2            |
-| ex2/                      | Intents #5, #6, #27, #28 + EN 12077-2:2024 4.6.1.4 (backup upper limit): does a given hoist logic satisfy them, in closed loop with a sensor fault?     | NuSMV             |
-| ex3/                      | Overload intents #7, #8, #9 with #1 and #16: can any controller satisfy them? (realizability)                                                           | Kind 2            |
-| ex4/                      | The suggested wording of the report (Table 12): is it realizable (4a), is each condition needed (4c), and can a design meet it (4b)?                    | Kind 2, NuSMV     |
-| optional_hanfor_reqcheck/ | Example 1 in Hanfor's pattern language, for Ultimate ReqCheck (needs Java 21 + UReqCheck)                                                               | Ultimate ReqCheck |
-| results/                  | Outputs of our run on 9 November 2026 (Kind 2 v3.0.0 + Z3 4.13.0, NuSMV 2.6.0)                                                                         |                   |
-| run_all.sh                | Runs every check and prints a short summary                                                                                                            |                   |
-| trace_to_csv.py           | Turns NuSMV counterexamples into CSV test scenarios (one row per PLC scan)                                                                              |                   |
+    .
+    ├── README.md                  this file
+    ├── demo/                      feasibility demo (formal checks)
+    │   ├── README.md              details, full table of results
+    │   ├── ex1/ … ex4/            Lustre (.lus) and NuSMV (.smv) models of the four examples
+    │   ├── optional_hanfor_reqcheck/   Example 1 in Hanfor's pattern language
+    │   ├── results/               outputs of the run on 9 November 2026
+    │   ├── run_all.sh             runs every check and prints a summary
+    │   └── trace_to_csv.py        NuSMV counterexamples -> CSV test scenarios
+    └── llm_study/                 analysis of the LLM study
+        ├── README.md              study design, fields of the data files, runs left out
+        ├── analysis/              scoring scripts, tables, figures, and the score data
+        ├── score_ex1.py, extract.py    scoring and parsing helpers
+        └── requirements.txt       Python packages (matplotlib, numpy)
 
-## Main results
+Each folder has its own README with the full details. This page gives only an overview.
 
-| Example | File                              | Result                                       | What it means                                                                                 |
-| ------- | --------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| 1       | ex1a_literal.lus                  | Unrealizable: #4 vs #16                      | Hook at the upper limit, joystick up and down at the same time                                |
-| 1       | ex1b_fix1.lus                     | Unrealizable: #1 vs #4                       | Hook at the upper limit, E-stop pressed, operator asks for lowering: no priority is stated     |
-| 1       | ex1c_fix2.lus                     | Realizable                                   | The conflict is gone once the E-stop has priority                                             |
-| 1       | ex1d_never_moves.lus              | A crane that never moves meets #1, #3, #16   | With #4 read as "may", the rules are too weak                                                 |
-| 2       | ex2_v1_literal.smv                | P3 (lock-out) fails                          | A program written word by word from the intents breaks EN 12077-2:2024 4.6.1.4                |
-| 2       | ex2_v2_lockout.smv                | All rules hold                               | Adding the lock-out fixes it                                                                  |
-| 2       | ex2_v3_shared_sensor.smv          | P1 fails: the hook hits the trolley          | All signal-level rules still pass; this shows why #28 is needed                               |
-| 3       | ex3a, ex3b, ex3c                  | Unrealizable: #9 vs #7, then #16, then #1    | Same "should remain available" pattern as #4, plus a conflict with the lower limit            |
-| 3       | ex3d_fix3.lus                     | Realizable                                   | After three added conditions                                                                  |
-| 4       | ex4a_suggested_wording.lus        | Realizable                                   | The suggested wording has no conflicts                                                        |
-| 4       | ex4c_without_backup_condition.lus | Unrealizable: suggested #4 vs lock-out rule  | The backup-limit condition in the suggested #4 is needed                                      |
-| 4       | ex4b_suggested_design.smv         | All 8 rules hold                             | A design can meet the suggested wording                                                       |
+## Part 1: feasibility demo (`demo/`)
 
-## How to run
+Four examples, each taken from a few requirement intents:
 
-You need Linux, or WSL on Windows, with `kind2` (v3.0.0), `z3`, `NuSMV` (2.6.0 or 2.5.4) and `python3` on PATH.
-Run everything:
+| Example | Intents | Question | Tool |
+|---|---|---|---|
+| 1 | #1, #3, #4, #16 (E-stop, primary upper limit) | Can any controller satisfy the rules for every operator input? (realizability) | Kind 2 |
+| 2 | #5, #6, #27, #28 + EN 12077-2:2024 4.6.1.4 (backup upper limit) | Does a given hoist logic satisfy them, also with a sensor fault? | NuSMV |
+| 3 | #7, #8, #9 with #1 and #16 (overload) | Can any controller satisfy them? | Kind 2 |
+| 4 | Suggested wording of the report (Table 12) | Is it realizable, is each condition needed, can a design meet it? | Kind 2, NuSMV |
 
+Main findings:
+
+- **Example 1:** the literal text is unrealizable (#4 conflicts with #16, then with #1). It becomes realizable
+  once the E-stop has priority. If #4 is read as "may", a crane that never moves satisfies the rules.
+- **Example 2:** a hoist program written word by word from the intents breaks the lock-out rule of
+  EN 12077-2:2024 4.6.1.4. With a shared sensor, all signal-level rules pass but the hook can hit the trolley,
+  which shows why #28 is needed.
+- **Example 3:** the overload rules have the same "should remain available" problem as #4. Three added
+  conditions make them realizable.
+- **Example 4:** the suggested wording is realizable, its backup-limit condition is needed, and a design
+  can meet all 8 rules.
+
+Run all checks (Linux or WSL, with `kind2` v3.0.0, `z3`, `NuSMV` 2.6.0 or 2.5.4 and `python3` on the PATH):
+
+    cd demo
     bash run_all.sh
 
-Each check takes less than one second. The full outputs go to `results/`, and the two counterexamples of
-ex2 are also written as CSV test scenarios.
+Each check takes less than one second. See [`demo/README.md`](demo/README.md) for single checks and notes.
 
-Run a single check:
+## Part 2: LLM study (`llm_study/`)
 
-    kind2 --enable CONTRACTCK ex1/ex1a_literal.lus     # realizability of a requirement set
-    kind2 ex1/ex1d_never_moves.lus                     # check concrete programs against their rules
-    NuSMV ex2/ex2_v1_literal.smv                       # model checking of a design
+Example 1 was given to four LLMs (GPT-5.6 Sol, DeepSeek-V4, Claude Sonnet 5.5, Gemini Hydrogen) in fresh chat
+sessions: with and without access to Kind 2, and with three versions of the prompt (original text, text with
+domain notes, #4 written with "shall"). 48 valid runs were scored automatically with Kind 2 and manually with
+a written rubric.
 
-On Windows, if bash reports `$'\r': command not found`, remove the Windows line endings first:
+Preliminary findings:
 
-    sed -i 's/\r$//' run_all.sh
+- In 48 of 48 runs, the model's verdict on its own formal translation matched Kind 2.
+- With the original text and no tool, no model read "may" in #4 as an obligation (0 of 12 runs).
+- Both hidden conflicts were named, and a good correction was proposed, in 42 of 48 runs; with the domain
+  notes or the "shall" text, in all 24 runs.
+- On this small task, access to Kind 2 did not improve the results.
 
-## Notes
+All scores are in `llm_study/analysis/all_runs.json`. The chat transcripts and the reference contracts are in
+the study kit (`crane_ai_study`), which is not public, so the scores can be read here but not recomputed
+without the kit. See [`llm_study/README.md`](llm_study/README.md) for how to reproduce the numbers.
 
-- One step in all models is one PLC scan cycle. The crane model in ex2 and ex4 is simplified: the hook
-  height has four zones, and there is no speed or braking distance.
-- The translations from the intents to formal rules are ours. They still need to be confirmed by the company.
-- Standard clauses are paraphrased. The standards themselves are not included in this repository.
-- The same verdicts were obtained on two machines with different tool versions (Z3 4.13.0 and 5.3.1;
-  NuSMV 2.6.0 and 2.5.4). Only run times and Kind 2's internal proof depth (`k=`) can differ.
-- The first versions of the model files were drafted with help from an AI assistant (Claude).
-  All checks were re-run and reviewed by the author.
+## Important notes
+
+- The translations from the requirement intents to formal rules are the author's. They still need to be
+  confirmed by the company.
+- The hoist logic in the demo (Examples 2 and 4) is illustrative and written from the intents. It is not
+  company code.
+- Standard clauses are paraphrased. The standards and `Crane_Case_Study.docx` are not included.
+- The results of the LLM study are preliminary. Claude Sonnet 5.5 is one of the tested models and the manual
+  scores were made with the help of Claude, so a person must check them before the results are published.
+
+## Use of AI assistance
+
+The first versions of the demo models, and the scripts, scoring and analysis of the LLM study, were prepared
+with the help of Claude (Anthropic). The author ran all chat sessions and all tool runs, and reviewed the
+results. The details are in the README of each folder.
+
+## Licence
+
+Not decided yet. Please ask the author before you reuse the data or the code.

@@ -27,7 +27,7 @@ The results were then compared with our earlier human-in-the-loop study of the s
   With the domain notes or the "shall" text, all 24 runs did both.
 - On this small task, access to Kind 2 did not improve the results.
 
-The full analysis is in the report (see "Related material").
+The full analysis is in the report (see "Related material"). The feasibility demo is in [`../demo/`](../demo/).
 
 ## What is in this folder
 
@@ -91,7 +91,7 @@ You need Linux or WSL, `kind2` (v3.0.0) and `z3` on the PATH, and Python 3 with 
 
 - Report: "Can Large Language Models Check Crane Safety Requirements on Their Own? A first comparison with a
   human-in-the-loop process", in the Overleaf project of the crane case (ask for access).
-- Earlier feasibility demo: https://github.com/SongyanLai/crane_demo
+- Earlier feasibility demo: [`../demo/`](../demo/) in this repository
 
 ## Use of AI assistance
 
