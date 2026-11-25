@@ -1,0 +1,13 @@
+{
+ "both_all": 42,
+ "good_all": 42,
+ "claim_all": 48,
+ "e1_all": 45,
+ "e16_all": 44,
+ "perm_runs": 29,
+ "vac_y": 23,
+ "vac_impl": 6,
+ "uncmd": 21,
+ "min_B": 2.0,
+ "min_C": 3.0
+}
